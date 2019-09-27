@@ -61,7 +61,8 @@ SELECT OrderID, ProductID, UnitPrice, Quantity, UnitPrice*Quantity AS TotalPrice
 FROM OrderDetails;
 
 -- Query #14
-SELECT COUNT(*) AS TotalCustomers FROM Customers;
+SELECT COUNT(*) AS TotalCustomers 
+FROM Customers;
 
 -- Query #15
 SELECT MIN(OrderDate) AS FirstOrder
@@ -85,13 +86,13 @@ ORDER BY TotalContactTitle DESC;
 
 -- Query #18
 SELECT Products.ProductID, Products.ProductName, Suppliers.CompanyName
-FROM Products INNER JOIN Suppliers 
-ON Products.SupplierID = Suppliers.SupplierID;
+FROM Products 
+INNER JOIN Suppliers ON Products.SupplierID = Suppliers.SupplierID;
 
 -- Query #19
 SELECT Orders.OrderID, CONVERT(DATE, Orders.OrderDate) AS OrderDate, Shippers.CompanyName AS Shipper
-FROM Orders INNER JOIN Shippers
-ON Shippers.ShipperID = Orders.ShipVia
+FROM Orders 
+INNER JOIN Shippers ON Shippers.ShipperID = Orders.ShipVia
 WHERE Orders.OrderID < 10270
 ORDER BY Orders.OrderID;
 
@@ -99,8 +100,8 @@ ORDER BY Orders.OrderID;
 
 -- Query #20
 SELECT Categories.CategoryName, COUNT(Categories.CategoryName) AS TotalProducts
-FROM Products INNER JOIN Categories
-ON Categories.CategoryID = Products.CategoryID
+FROM Products 
+INNER JOIN Categories ON Categories.CategoryID = Products.CategoryID
 GROUP BY Categories.CategoryName
 ORDER BY TotalProducts DESC;
 
@@ -126,10 +127,12 @@ ORDER BY ProductID ASC;
 SELECT CustomerID, CompanyName, Region 
 FROM Customers
 ORDER BY 
-    (CASE 
-    WHEN Region IS NOT NULL THEN 0
-    ELSE 1
-    END) ASC,
+    (
+        CASE 
+        WHEN Region IS NOT NULL THEN 0
+        ELSE 1
+        END
+    ) ASC,
     Region ASC, 
     CustomerID ASC;
 
@@ -163,14 +166,14 @@ ORDER BY o.OrderID, p.ProductID;
 
 -- Query #30
 SELECT c.CustomerID, o.CustomerID
-FROM Customers AS c LEFT JOIN Orders as o
-ON c.CustomerID = o.CustomerID
+FROM Customers AS c 
+LEFT JOIN Orders as o ON c.CustomerID = o.CustomerID
 WHERE o.CustomerID IS NULL;
 
 -- Query #31
 SELECT Customers.CustomerID, Orders.CustomerID
-FROM Customers LEFT JOIN Orders
-ON Customers.CustomerID = Orders.CustomerID
+FROM Customers 
+LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID
 AND Orders.EmployeeID = 4
 WHERE Orders.CustomerID IS NULL;
 
@@ -183,14 +186,21 @@ WITH VIPOrders AS (
     GROUP BY OrderID
     HAVING SUM(UnitPrice*Quantity) >= 10000
 )
-SELECT Orders.CustomerID, Customers.CompanyName, VIPOrders.OrderID, VIPOrders.TotalOrderAmount
+SELECT 
+    Orders.CustomerID, 
+    Customers.CompanyName, 
+    VIPOrders.OrderID, 
+    VIPOrders.TotalOrderAmount
 FROM VIPOrders
 INNER JOIN Orders ON VIPOrders.OrderID = Orders.OrderID
 INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID
 WHERE YEAR(Orders.OrderDate) = '2016';
 
 -- Query #33
-SELECT Customers.CustomerID, Customers.CompanyName, SUM(OrderDetails.Quantity*OrderDetails.UnitPrice) AS TotalOrderAmount
+SELECT 
+    Customers.CustomerID, 
+    Customers.CompanyName, 
+    SUM(OrderDetails.Quantity*OrderDetails.UnitPrice) AS TotalOrderAmount
 FROM Orders 
 INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
 INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID
@@ -200,7 +210,10 @@ HAVING SUM(OrderDetails.Quantity*OrderDetails.UnitPrice) >= 15000
 ORDER BY TotalOrderAmount DESC;
 
 -- Query #34
-SELECT Customers.CustomerID, Customers.CompanyName, SUM(OrderDetails.Quantity*OrderDetails.UnitPrice*(1-OrderDetails.Discount)) AS TotalOrderAmount
+SELECT 
+    Customers.CustomerID, 
+    Customers.CompanyName, 
+    SUM(OrderDetails.Quantity*OrderDetails.UnitPrice*(1-OrderDetails.Discount)) AS TotalOrderAmount
 FROM Orders 
 INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
 INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID
@@ -242,15 +255,16 @@ WITH query_1 AS
     INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
     WHERE EmployeeID = 3 AND Quantity >= 60),
 
-    query_2 AS
+query_2 AS
 
-        (SELECT OrderID, COUNT(*) AS total
-        FROM query_1
-        GROUP BY OrderID
-        HAVING COUNT(*) > 1)
+    (SELECT OrderID, COUNT(*) AS total
+    FROM query_1
+    GROUP BY OrderID
+    HAVING COUNT(*) > 1)
 
 SELECT query_1.OrderID, query_1.ProductID, query_1.Quantity 
-FROM query_1 INNER JOIN query_2 ON query_1.OrderID = query_2.OrderID
+FROM query_1 
+INNER JOIN query_2 ON query_1.OrderID = query_2.OrderID
 ORDER BY query_1.OrderID;
 
 -- Query #39
@@ -279,7 +293,8 @@ WITH query_1 AS (
 )
 
 SELECT query_1.EmployeeID, Employees.LastName, query_1.num_late_orders
-FROM query_1 INNER JOIN Employees ON query_1.EmployeeID = Employees.EmployeeID
+FROM query_1 
+INNER JOIN Employees ON query_1.EmployeeID = Employees.EmployeeID
 ORDER BY num_late_orders DESC;
 
 -- Query #43
@@ -296,7 +311,11 @@ query_2 AS (
     GROUP BY EmployeeID
 )
 
-SELECT query_1.EmployeeID, Employees.LastName, query_2.num_all_orders, query_1.num_late_orders
+SELECT 
+    query_1.EmployeeID, 
+    Employees.LastName, 
+    query_2.num_all_orders, 
+    query_1.num_late_orders
 FROM query_1 
 INNER JOIN Employees ON query_1.EmployeeID = Employees.EmployeeID
 INNER JOIN query_2 ON Employees.EmployeeID = query_2.EmployeeID
@@ -316,7 +335,11 @@ query_2 AS (
     GROUP BY EmployeeID
 )
 
-SELECT query_2.EmployeeID, Employees.LastName, query_2.num_all_orders, query_1.num_late_orders
+SELECT 
+    query_2.EmployeeID, 
+    Employees.LastName, 
+    query_2.num_all_orders, 
+    query_1.num_late_orders
 FROM query_2 
 LEFT JOIN Employees ON query_2.EmployeeID = Employees.EmployeeID
 LEFT JOIN query_1 ON Employees.EmployeeID = query_1.EmployeeID
@@ -336,7 +359,11 @@ query_2 AS (
     GROUP BY EmployeeID
 )
 
-SELECT query_2.EmployeeID, Employees.LastName, query_2.num_all_orders, ISNULL(query_1.num_late_orders, 0) AS num_late_orders
+SELECT 
+    query_2.EmployeeID, 
+    Employees.LastName, 
+    query_2.num_all_orders, 
+    ISNULL(query_1.num_late_orders, 0) AS num_late_orders
 FROM query_2 
 LEFT JOIN Employees ON query_2.EmployeeID = Employees.EmployeeID
 LEFT JOIN query_1 ON Employees.EmployeeID = query_1.EmployeeID
@@ -356,9 +383,12 @@ query_2 AS (
     GROUP BY EmployeeID
 )
 
-SELECT query_2.EmployeeID, Employees.LastName, query_2.num_all_orders, 
-ISNULL(query_1.num_late_orders, 0) AS num_late_orders, 
-ISNULL((CAST (query_1.num_late_orders AS FLOAT) / CAST (query_2.num_all_orders AS FLOAT)), 0) AS percent_late_orders
+SELECT 
+    query_2.EmployeeID, 
+    Employees.LastName, 
+    query_2.num_all_orders, 
+    ISNULL(query_1.num_late_orders, 0) AS num_late_orders, 
+    ISNULL((CAST (query_1.num_late_orders AS FLOAT) / CAST (query_2.num_all_orders AS FLOAT)), 0) AS percent_late_orders
 FROM query_2 
 LEFT JOIN Employees ON query_2.EmployeeID = Employees.EmployeeID
 LEFT JOIN query_1 ON Employees.EmployeeID = query_1.EmployeeID
@@ -378,9 +408,12 @@ query_2 AS (
     GROUP BY EmployeeID
 )
 
-SELECT query_2.EmployeeID, Employees.LastName, query_2.num_all_orders, 
-ISNULL(query_1.num_late_orders, 0) AS num_late_orders, 
-ISNULL(ROUND((CAST (query_1.num_late_orders AS FLOAT) / CAST (query_2.num_all_orders AS FLOAT)), 2), 0) AS percent_late_orders
+SELECT 
+    query_2.EmployeeID, 
+    Employees.LastName, 
+    query_2.num_all_orders, 
+    ISNULL(query_1.num_late_orders, 0) AS num_late_orders, 
+    ISNULL(ROUND((CAST (query_1.num_late_orders AS FLOAT) / CAST (query_2.num_all_orders AS FLOAT)), 2), 0) AS percent_late_orders
 FROM query_2 
 LEFT JOIN Employees ON query_2.EmployeeID = Employees.EmployeeID
 LEFT JOIN query_1 ON Employees.EmployeeID = query_1.EmployeeID
@@ -399,13 +432,16 @@ query_2 AS (
     GROUP BY OrderID
 )
 
-SELECT query_1.CustomerID, Customers.CompanyName, SUM(query_2.total_order_amount) AS total_order_amount,
-CASE
-    WHEN SUM(query_2.total_order_amount) <= 1000 THEN 'Low'
-    WHEN SUM(query_2.total_order_amount) <= 5000 THEN 'Medium'
-    WHEN SUM(query_2.total_order_amount) <= 10000 THEN 'High'
-    ELSE 'Very High'
-END AS customer_group
+SELECT 
+    query_1.CustomerID, 
+    Customers.CompanyName, 
+    SUM(query_2.total_order_amount) AS total_order_amount,
+    CASE
+        WHEN SUM(query_2.total_order_amount) <= 1000 THEN 'Low'
+        WHEN SUM(query_2.total_order_amount) <= 5000 THEN 'Medium'
+        WHEN SUM(query_2.total_order_amount) <= 10000 THEN 'High'
+        ELSE 'Very High'
+        END AS customer_group
 FROM query_1
 INNER JOIN Customers ON query_1.CustomerID = Customers.CustomerID
 INNER JOIN query_2 ON query_1.OrderID = query_2.OrderID
@@ -425,13 +461,16 @@ query_2 AS (
     GROUP BY OrderID
 )
 
-SELECT query_1.CustomerID, Customers.CompanyName, SUM(query_2.total_order_amount) AS total_order_amount,
-CASE
-    WHEN SUM(query_2.total_order_amount) <= 1000 THEN 'Low'
-    WHEN SUM(query_2.total_order_amount) <= 5000 THEN 'Medium'
-    WHEN SUM(query_2.total_order_amount) <= 10000 THEN 'High'
-    ELSE 'Very High'
-END AS customer_group
+SELECT 
+    query_1.CustomerID, 
+    Customers.CompanyName, 
+    SUM(query_2.total_order_amount) AS total_order_amount,
+    CASE
+        WHEN SUM(query_2.total_order_amount) <= 1000 THEN 'Low'
+        WHEN SUM(query_2.total_order_amount) <= 5000 THEN 'Medium'
+        WHEN SUM(query_2.total_order_amount) <= 10000 THEN 'High'
+        ELSE 'Very High'
+    END AS customer_group
 FROM query_1
 INNER JOIN Customers ON query_1.CustomerID = Customers.CustomerID
 INNER JOIN query_2 ON query_1.OrderID = query_2.OrderID
@@ -452,7 +491,8 @@ query_2 AS (
 ),
 
 query_3 AS (
-    SELECT query_1.CustomerID, Customers.CompanyName, SUM(query_2.total_order_amount) AS total_order_amount,
+    SELECT query_1.CustomerID, Customers.CompanyName, 
+    SUM(query_2.total_order_amount) AS total_order_amount,
     CASE
         WHEN SUM(query_2.total_order_amount) <= 1000 THEN 'Low'
         WHEN SUM(query_2.total_order_amount) <= 5000 THEN 'Medium'
@@ -505,7 +545,9 @@ FROM Suppliers
 ORDER BY Country ASC;
 
 -- Query #53
-SELECT DISTINCT Suppliers.Country AS supplier_country, Customers.Country AS customer_country
+SELECT DISTINCT 
+    Suppliers.Country AS supplier_country, 
+    Customers.Country AS customer_country
 FROM Suppliers
 FULL OUTER JOIN  Customers ON Suppliers.Country = Customers.Country
 ORDER BY Suppliers.Country, Customers.Country;
@@ -523,7 +565,10 @@ cc AS (
     GROUP BY Country 
 )
 
-SELECT ISNULL(sc.Country, cc.Country) AS country, ISNULL(sc.total_suppliers, 0) AS total_suppliers, ISNULL(cc.total_customers, 0) AS total_customers
+SELECT 
+    ISNULL(sc.Country, cc.Country) AS country, 
+    ISNULL(sc.total_suppliers, 0) AS total_suppliers, 
+    ISNULL(cc.total_customers, 0) AS total_customers
 FROM sc
 FULL OUTER JOIN cc ON sc.Country = cc.Country;
 
@@ -541,7 +586,8 @@ WITH query AS (
     FROM Orders
 )
 
-SELECT ShipCountry, CustomerID, OrderID, OrderDate FROM query
+SELECT ShipCountry, CustomerID, OrderID, OrderDate 
+FROM query
 WHERE test_column = 1;
 
 -- Query #56
